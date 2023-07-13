@@ -2,14 +2,17 @@ use std::{env, sync::Mutex};
 
 use actix_web::{HttpServer, App, middleware::Logger, web::Data};
 use dotenvy::dotenv;
-use models::channel::Channel;
+use models::{channel::Channel, user::User};
 
 pub mod routes;
 pub mod models;
+pub mod handlers;
 
 
 pub struct AppState {
-    pub channels : Mutex<Vec<Channel>>
+    // TODO Replace to HashMap
+    pub channels: Mutex<Vec<Channel>>,
+    pub users: Mutex<Vec<User>>
 }
 
 #[actix_rt::main]
@@ -25,7 +28,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
         //.wrap(CORS::default())
         .app_data(Data::new(
-            AppState { channels: Mutex::new(Vec::new()) }
+            AppState { 
+                channels: Mutex::new(Vec::new()),
+                users: Mutex::new(Vec::new())
+             }
         ))
         .wrap(Logger::default())
         .configure(routes::routes_factory)

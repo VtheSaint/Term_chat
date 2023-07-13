@@ -4,7 +4,7 @@ use super::user::User;
 
 #[derive(Clone)]
 pub struct Channel {
-    id: Uuid,
+    pub id: Uuid,
     pub name: String,
     pub users: Vec<User>   
 }
@@ -27,5 +27,11 @@ impl Channel {
         self.users = self.users.iter().filter(|&u| u.name != user.name).cloned().collect();
     }
 
+
+    pub fn message(&self, message: String) {
+        for user in self.users.iter() {
+            // TODO : Send message to user
+        }
+    }
 }
 

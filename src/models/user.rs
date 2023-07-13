@@ -11,7 +11,7 @@ pub struct User {
 
 
 impl User {
-    pub fn new_message(self, body: String) -> String {
+    pub fn new_message(&self, body: String) -> String {
         format!("{}: {}", self.name, body)
     }
 
