@@ -1,8 +1,10 @@
 use actix_web::{web::{Json, Data}, HttpResponse};
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{models::{user::User, channel::Channel}, AppState};
 
+#[derive(Deserialize)]
 pub struct MessageData {
     pub user_id: Uuid,
     pub channel_id: Uuid,
@@ -10,7 +12,7 @@ pub struct MessageData {
 }
 
 
-pub fn new_message(
+pub async fn new_message(
     req: Json<Option<MessageData>>,
     state: Data<AppState>
 ) -> HttpResponse {
@@ -31,7 +33,7 @@ pub fn new_message(
     let result = User::new_message(current_user,  data.message);
 
     // Sending the message to the channel
-    Channel::message(current_channel, result);
+    Channel::message(current_channel, result).await;
 
     HttpResponse::Ok().finish()
 }

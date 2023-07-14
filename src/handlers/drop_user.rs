@@ -1,16 +1,17 @@
 use actix_web::{web::{Json, Data}, HttpResponse};
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{AppState, models::{user::User, channel::Channel}};
 
 
-
+#[derive(Deserialize)]
 pub struct DropData {
     user_id: Uuid,
     channel_id: Uuid,
 }
 
-pub fn drop_user(
+pub async fn drop_user(
     req: Json<Option<DropData>>,
     state: Data<AppState>
 ) -> HttpResponse {
@@ -35,7 +36,7 @@ pub fn drop_user(
                     Channel::remove_user(channel, &user);
 
                     // Publish message to channel
-                    Channel::message(&channel, result);
+                    Channel::message(&channel, result).await;
                     break;
                 }
             }

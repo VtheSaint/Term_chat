@@ -5,6 +5,7 @@ use actix_web_lab::sse::{self, ChannelStream, Sse};
 use futures_util::future;
 use parking_lot::Mutex;
 
+#[derive(Debug)]
 pub struct Broadcaster {
     inner: Mutex<BroadcasterInner>,
 }
@@ -15,7 +16,7 @@ struct BroadcasterInner {
 }
 
 impl Broadcaster {
-    /// Constructs new broadcaster and spawns ping loop.
+    // Constructs new broadcaster and spawns ping loop.
     pub fn create() -> Arc<Self> {
         let this = Arc::new(Broadcaster {
             inner: Mutex::new(BroadcasterInner::default()),
@@ -29,7 +30,7 @@ impl Broadcaster {
     /// Pings clients every second to see if they are alive and remove them from the broadcast list if not.
     fn spawn_ping(this: Arc<Self>) {
         actix_web::rt::spawn(async move {
-            let mut interval = interval(Duration::from_secs(3));
+            let mut interval = interval(Duration::from_secs(1));
 
             loop {
                 interval.tick().await;
@@ -41,11 +42,11 @@ impl Broadcaster {
     /// Removes all non-responsive clients from broadcast list.
     async fn remove_stale_clients(&self) {
         let clients = self.inner.lock().clients.clone();
-        println!("active client {:?}",clients);
+        // println!("active client {:?}",clients);
 
         let mut ok_clients = Vec::new();
 
-        println!("okay active client {:?}",ok_clients);
+        // println!("okay active client {:?}",ok_clients);
 
         for client in clients {
             if client

@@ -1,19 +1,21 @@
-use actix_web::{web::{Json, Data}, HttpResponse};
+use actix_web::{web::{Json, Data}, HttpResponse, Responder};
+use actix_web_lab::sse;
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{AppState, models::{user::User, channel::Channel}};
 
-
+#[derive(Deserialize)]
 pub struct NewUser {
     pub name: String,
-    pub channel_id: Uuid,
+    pub channel_name: String,
 }
 
-pub fn new_user(
+pub async fn new_user(
     req: Json<Option<NewUser>>,
     state: Data<AppState>
-) -> HttpResponse {
-
+) -> impl Responder {
+    let mut response = sse::channel(10).1;
     // get data from request
     let data = req.into_inner().unwrap();
 
@@ -22,20 +24,23 @@ pub fn new_user(
 
     // iterate over channels and push new user
     for channel in channels.iter_mut() {
-        if channel.id == data.channel_id {
+        if channel.name == data.channel_name {
             let new_user = User {
                 id: Uuid::new_v4(),
                 name: data.name.clone(),
             };
-            Channel::add_user(channel, &new_user);
+            // println!("users: {:?}", channel.users);
+            // println!("state: {:?}", state.channels);
+            response = Channel::add_user(channel, &new_user).await;
             
+
             // Construct message 
             let result = User::enter_channel(new_user, channel.name.as_str());
             
             // Publsih message to channel
-            Channel::message(&channel, result);
-            break;
+            Channel::message(&channel, result).await;
         }
+
     }
-    HttpResponse::Ok().finish()
+    response
 }

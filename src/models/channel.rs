@@ -1,12 +1,16 @@
+use std::sync::Arc;
+
+use actix_web_lab::sse::{Sse, ChannelStream};
 use uuid::Uuid;
 
-use super::user::User;
+use super::{user::User, broadcast::Broadcaster};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Channel {
     pub id: Uuid,
     pub name: String,
-    pub users: Vec<User>   
+    pub users: Vec<User>,
+    pub broadcaster: Arc<Broadcaster>,
 }
 
 impl Channel {
@@ -18,9 +22,9 @@ impl Channel {
         result.pop();
         result.pop();
     }
-
-    pub fn add_user(&mut self, user: &User) {
+    pub async fn add_user(&mut self, user: &User) -> Sse<ChannelStream> {
         self.users.push(user.clone());
+        self.broadcaster.new_client().await
         
     }
 
@@ -29,10 +33,11 @@ impl Channel {
     }
 
 
-    pub fn message(&self, message: String) {
+    pub async fn message(&self, message: String) {
         for user in self.users.iter() {
             // TODO : Send message to user
             // Needs SSE 
+            self.broadcaster.broadcast(message.as_str()).await
         }
     }
 }

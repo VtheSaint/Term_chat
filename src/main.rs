@@ -10,7 +10,6 @@ pub mod handlers;
 
 
 pub struct AppState {
-    // TODO Replace to HashMap
     pub channels: Mutex<Vec<Channel>>,
     pub users: Mutex<Vec<User>>
 }
