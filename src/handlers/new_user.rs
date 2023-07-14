@@ -6,7 +6,6 @@ use crate::{AppState, models::{user::User, channel::Channel}};
 
 pub struct NewUser {
     pub name: String,
-    // TODO : Realise get_channels handler 
     pub channel_id: Uuid,
 }
 
@@ -21,15 +20,22 @@ pub fn new_user(
     // get channels from state
     let mut channels = state.channels.lock().unwrap();
 
-    for channel in channels {
+    // iterate over channels and push new user
+    for channel in channels.iter_mut() {
+        if channel.id == data.channel_id {
+            let new_user = User {
+                id: Uuid::new_v4(),
+                name: data.name.clone(),
+            };
+            Channel::add_user(channel, &new_user);
+            
+            // Construct message 
+            let result = User::enter_channel(new_user, channel.name.as_str());
+            
+            // Publsih message to channel
+            Channel::message(&channel, result);
+            break;
+        }
     }
-    let current_user = User {
-        id: Uuid::new_v4(),
-        name: data.name.clone(),
-    };
-
-    Channel::add_user(&mut current_channel, current_user);
-    // let result = User::enter_channel(self, group)
-
     HttpResponse::Ok().finish()
 }

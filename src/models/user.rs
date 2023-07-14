@@ -19,7 +19,7 @@ impl User {
         format!("{} is now in {} channel", self.name, group)
     }
 
-    pub fn leave_channel(self, group: &str) -> String {
+    pub fn leave_channel(&self, group: &str) -> String {
         format!("{} is no longer in {} channel", self.name, group)
     }
 }

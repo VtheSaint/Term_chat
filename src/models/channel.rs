@@ -19,11 +19,12 @@ impl Channel {
         result.pop();
     }
 
-    pub fn add_user(&mut self, user: User) {
-        self.users.push(user);
+    pub fn add_user(&mut self, user: &User) {
+        self.users.push(user.clone());
+        
     }
 
-    pub fn remove_user(&mut self, user: User) {
+    pub fn remove_user(&mut self, user: &User) {
         self.users = self.users.iter().filter(|&u| u.name != user.name).cloned().collect();
     }
 
@@ -31,6 +32,7 @@ impl Channel {
     pub fn message(&self, message: String) {
         for user in self.users.iter() {
             // TODO : Send message to user
+            // Needs SSE 
         }
     }
 }
