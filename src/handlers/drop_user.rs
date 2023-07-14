@@ -14,11 +14,17 @@ pub fn drop_user(
     req: Json<Option<DropData>>,
     state: Data<AppState>
 ) -> HttpResponse {
+    // Getting data from request body
     let data = req.into_inner().unwrap();
+
+    // Get channels from state
     let mut channels = state.channels.lock().unwrap();
+
+    // Find channel with given id
     for channel in channels.iter_mut() {
         if channel.id == data.channel_id {
-            // let result = User::leave_channel(self, group);\
+
+            // Find user in channel
             for user in channel.clone().users.iter_mut() {
                 if user.id == data.user_id {
                     
