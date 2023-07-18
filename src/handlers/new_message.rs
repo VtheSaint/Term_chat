@@ -23,8 +23,12 @@ pub async fn new_message(
     // get users and channels from state
     let users = state.users.lock().unwrap();
     let channels = state.channels.lock().unwrap();
-    println!("Users: {:#?}", users);
-    println!("Data: {:#?}", data);
+    
+    
+    // println!("Users: {:#?}", users);
+    // println!("Data: {:#?}", data);
+
+
     // Get current user and channel from Vecs 
     let current_user = *(users.iter().filter(|u| u.name == data.user_name).collect::<Vec<&User>>().last().unwrap());
     let current_channel = *(channels.iter().filter(|c| c.name == data.channel_name).collect::<Vec<&Channel>>().last().unwrap());

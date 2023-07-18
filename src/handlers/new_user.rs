@@ -24,16 +24,28 @@ pub async fn new_user(
     let mut users = state.users.lock().unwrap();
     // iterate over channels and push new user
 
-    println!("state: {:?}", state.channels);
+
+
+    // println!("state: {:?}", state.channels);
+
+
     for channel in channels.iter_mut() {
-        println!("channel: {:?}", channel);
-        println!("users: {:?}", channel.users);
+    
+    
+        // println!("channel: {:?}", channel);
+        // println!("users: {:?}", channel.users);
+    
+    
         if channel.name == data.channel_name {
             let new_user = User {
                 id: Uuid::new_v4(),
                 name: data.name.clone(),
             };
-            println!("New user is {:?}", new_user);
+            
+            
+            // println!("New user is {:?}", new_user);
+
+
             users.push(new_user.clone());
 
             // adding new user to channel

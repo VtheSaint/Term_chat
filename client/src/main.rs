@@ -1,6 +1,8 @@
-use std::io;
+use std::io::{self};
 
+use bytes::Bytes;
 use serde::{Deserialize, Serialize};
+use futures_util::stream::StreamExt;
 
 #[tokio::main]
 async fn main() {
@@ -69,11 +71,25 @@ async fn start_chat(name: &str) {
         name: name.trim().to_string()
     };
 
-    let sse_client = reqwest::Client::new()
+
+    // creating new stream
+    let mut sse_client = reqwest::Client::new()
         .post("http://127.0.0.1:8080/api/v1/create/user")
         .json(&body)
-        .send().await.unwrap();
-    println!("{}", sse_client.status());
+        .send()
+        .await
+        .unwrap()
+        .bytes_stream();
+
+    // create a new thread for printing messages
+    tokio::spawn(async move  {
+        while let Some(item) = sse_client.next().await {
+            let item = item.unwrap();
+            if item == Bytes::from_static(b": ping\n\n") {continue;}
+            println!("{}", String::from_utf8(item.to_vec()).unwrap());
+        }
+    });
+    // main loop for input the message
     loop {
         let mut message = String::new();
         io::stdin()
@@ -89,7 +105,6 @@ async fn start_chat(name: &str) {
                 user_name: name.trim().to_string(),
                 channel_name: channel_name.trim().to_string()
             };
-            println!("{:?}", body);
             let message = reqwest::Client::new();
             let response = message
                 .post("http://127.0.0.1:8080/api/v1/create/message")
@@ -97,11 +112,9 @@ async fn start_chat(name: &str) {
                 .send()
                 .await;
             match response {
-                Ok(value) => {println!("{:?}", value)},
+                Ok(_) => {},
                 Err(e) => {println!("Error: {}", e);},
             }
-            // println!("{:?}", response);
-            // println!("{:?}", response.status());
         }
     }
 }
@@ -151,7 +164,10 @@ async fn create_channel() {
         .post("http://127.0.0.1:8080/api/v1/create/channel")
         .json(&body)
         .send();
-    println!("Response: {}", res.await.unwrap().status());
+    match res.await {
+        Ok(_) => {},
+        Err(e) => {println!("Error: {}", e);},
+    }
     println!("Канал создан.");
 
 }

@@ -30,8 +30,6 @@ pub async fn new_channel(
                 broadcaster: Arc::clone(&broadcaster),
             }
         );
-        // println!("{:?}", channels);
-        // println!("{:?}", state.channels);
         return HttpResponse::Ok().finish()
     }
     HttpResponse::BadRequest().finish()

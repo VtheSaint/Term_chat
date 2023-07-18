@@ -15,7 +15,11 @@ pub async fn show_channels(
     let res = state.channels.lock().unwrap().clone();
     let mut result: Vec<ShowData> = Vec::new();
     for chn in res.iter() {
+
+        
         // println!("{:?}", chn.name);
+
+
         result.push(
             ShowData {
                 channel_name: chn.name.clone(),
