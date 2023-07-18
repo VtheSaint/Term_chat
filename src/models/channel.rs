@@ -14,6 +14,7 @@ pub struct Channel {
 }
 
 impl Channel {
+
     pub fn get_users(&self) {
         let mut result = String::from("Users in channel: ");
         for user in self.users.iter() {
@@ -22,6 +23,7 @@ impl Channel {
         result.pop();
         result.pop();
     }
+
     pub async fn add_user(&mut self, user: &User) -> Sse<ChannelStream> {
         self.users.push(user.clone());
         self.broadcaster.new_client().await
@@ -32,13 +34,10 @@ impl Channel {
         self.users = self.users.iter().filter(|&u| u.name != user.name).cloned().collect();
     }
 
-
     pub async fn message(&self, message: String) {
-        for user in self.users.iter() {
-            // TODO : Send message to user
-            // Needs SSE 
+        // for user in self.users.iter() {
             self.broadcaster.broadcast(message.as_str()).await
-        }
+        // }
     }
 }
 

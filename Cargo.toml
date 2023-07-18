@@ -23,3 +23,9 @@ futures-util = { version = "0.3.25", default-features = false, features = ["std"
 # actix-web-lab = "0.18.5"
 # parking_lot = "0.12.1"
 # futures-util = { version = "0.3.25", default-features = false, features = ["std"] }
+
+[workspace]
+members = [
+    "client"
+
+]

@@ -1,4 +1,4 @@
-use actix_web::{web::{Json, Data}, HttpResponse, Responder};
+use actix_web::{web::{Json, Data}, Responder};
 use actix_web_lab::sse;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -21,16 +21,22 @@ pub async fn new_user(
 
     // get channels from state
     let mut channels = state.channels.lock().unwrap();
-
+    let mut users = state.users.lock().unwrap();
     // iterate over channels and push new user
+
+    println!("state: {:?}", state.channels);
     for channel in channels.iter_mut() {
+        println!("channel: {:?}", channel);
+        println!("users: {:?}", channel.users);
         if channel.name == data.channel_name {
             let new_user = User {
                 id: Uuid::new_v4(),
                 name: data.name.clone(),
             };
-            // println!("users: {:?}", channel.users);
-            // println!("state: {:?}", state.channels);
+            println!("New user is {:?}", new_user);
+            users.push(new_user.clone());
+
+            // adding new user to channel
             response = Channel::add_user(channel, &new_user).await;
             
 
@@ -40,6 +46,8 @@ pub async fn new_user(
             // Publsih message to channel
             Channel::message(&channel, result).await;
         }
+        println!("users: {:?}", channel.users);
+
 
     }
     response
